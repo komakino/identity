@@ -11,27 +11,28 @@ class SwedishIdentity extends Identity
     use BirthdayTrait;
 
     protected $validationPattern = '/^(?:[\d]{2})?[\d]{6}[-+]?[\d]{4}$/';
-    protected $parsePattern      = '/^(?<century>\w{2})?(?<year>\w{2})(?<month>\w{2})(?<day>\w{2})(?<separator>[-+]?)(?<locality>\w{2})(?<number>\w{1})(?<checkdigit>\w{1})/';
-    protected $outputFormat      = '{year}{month}{day}-{locality}{number}{checkdigit}';
+    protected $parsePattern      = '/^(?<century>\w{2})?(?<year>\w{2})(?<month>\w{2})(?<day>\w{2})(?<centuryHint>[-+]?)(?<locality>\w{2})(?<number>\w{1})(?<checkdigit>\w{1})/';
+    protected $outputFormat      = '{year}{month}{day}{centuryHint}{locality}{number}{checkdigit}';
 
     protected $properties = [
-        'type'       => null,
-        'century'    => null,
-        'year'       => null,
-        'month'      => null,
-        'day'        => null,
-        'locality'   => null,
-        'county'     => null,
-        'number'     => null,
-        'gender'     => null,
-        'checkdigit' => null,
-        'birthday'   => null,
-        'temporary'  => false,
+        'type'        => null,
+        'century'     => null,
+        'centuryHint' => null,
+        'year'        => null,
+        'month'       => null,
+        'day'         => null,
+        'locality'    => null,
+        'county'      => null,
+        'number'      => null,
+        'gender'      => null,
+        'checkdigit'  => null,
+        'birthday'    => null,
+        'temporary'   => false,
     ];
 
 
     protected function validate(){
-        $this->valid = Luhn::validate($this->format());
+        return Luhn::validate($this->format());
     }
 
     protected function parse()
@@ -43,12 +44,16 @@ class SwedishIdentity extends Identity
             $this->properties['temporary'] = true;
         }
 
+        if(!$matches['centuryHint']){
+            $this->properties['centuryHint'] = '-';
+        }
+
         if($this->properties['month'] > 12){
             $this->properties['type']       = 'organization';
             $this->properties['century']    = '16';
         } else {
             $this->properties['type']       = 'person';
-            $this->properties['century']    = $matches['century'] ?: $this->calculateCentury($matches['separator']);
+            $this->properties['century']    = $matches['century'] ?: $this->calculateCentury($matches['centuryHint']);
             $this->properties['gender']     = $this->properties['number'] % 2 ? 'male' : 'female';
             $this->properties['birthday']   = $this->composeBirthday();
             $this->properties['county']     = $this->parseCounty();
@@ -56,7 +61,7 @@ class SwedishIdentity extends Identity
 
     }
 
-    private function calculateCentury($separator)
+    private function calculateCentury($centuryHint)
     {
         extract($this->properties);
         $thisYear = date('y');
@@ -65,7 +70,7 @@ class SwedishIdentity extends Identity
         } else {
             $century = "19";
         }
-        if($separator == '+') $century -= 1;
+        if($centuryHint == '+') $century -= 1;
 
         return (string)$century;
     }

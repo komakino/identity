@@ -16,8 +16,8 @@ abstract class Identity
         $this->code = $code;
         if($this->validatePattern()){
             $this->parse();
-            $this->validate();
-        }
+            $this->valid = $this->validate();
+        } else var_dump($code);
     }
 
     protected function validatePattern()
