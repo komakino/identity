@@ -17,10 +17,10 @@ class SwedishIdentity extends Identity
     protected $properties = [
         'type'        => null,
         'century'     => null,
-        'centuryHint' => null,
         'year'        => null,
         'month'       => null,
         'day'         => null,
+        'centuryHint' => null,
         'locality'    => null,
         'county'      => null,
         'number'      => null,

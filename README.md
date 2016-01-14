@@ -5,6 +5,7 @@ Identity is a composer package to validate, parse, format and extract various in
 **Current implementations**:
 * Swedish personnummer/organisationsnummer
 * Danish personnummer/CPR-nummer
+* Finnish henkilötunnus/personbeteckning
 
 ## Installation
 
@@ -85,6 +86,9 @@ Upon construction, the number is parsed and validated.
     * xx**OO**xx-xxxx
 * **day**
     * xxxx**OO**-xxxx
+* **centuryHint**
+    * xxxxx**-**xxxx
+    * Defaults to *-*
 * **locality**
     * xxxxxx-**OO**xx
 * **county**
@@ -111,14 +115,47 @@ Upon construction, the number is parsed and validated.
 
 #### Number properties
 * **century**
+    * Calculated from *year* and *centuryHint*
 * **day**
     * **OO**xxxx-xxxx
 * **month**
     * xx**OO**xx-xxxx
 * **year**
     * xxxx**OO**-xxxx
+* **centuryHint**
+    * xxxxxx-**O**xxx
 * **sequence**
-    * xxxxxx-**OOOO**
+    * xxxxxx-**OOO0**
+* **gender**
+    * *male*/*female*
+* **birthday**
+    * A **DateTime** object
+
+
+### Finnish personnummer/CPR-nummer
+
+#### Allowed input
+* `311280-888Y`
+
+#### Formatted output
+`311280-888Y`
+
+#### Number properties
+* **century**
+    * Defined by *centuryHint*
+* **day**
+    * **OO**xxxx-xxxx
+* **month**
+    * xx**OO**xx-xxxx
+* **year**
+    * xxxx**OO**-xxxx
+* **centuryHint**
+    * xxxxx**-**xxxx
+    * *-*/*+*/*A*
+* **number**
+    * xxxxxx-**OOO**x
+* **checkdigit**
+    * xxxxxx-xxx**O**
 * **gender**
     * *male*/*female*
 * **birthday**
