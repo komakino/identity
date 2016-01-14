@@ -30,10 +30,6 @@ class FinnishIdentity extends Identity
     {
         $matches = parent::parse();
 
-        # The sign for the century is either + (1800–1899), - (1900–1999), or A (2000–2099).
-        # The individual number ZZZ is odd for males and even for females and for people
-        # born in Finland its range is 002-899 (larger numbers may be used in special cases). An example of a valid code is 311280-888Y.
-
         $this->properties['gender'] = $matches['number'] % 2 ? 'male' : 'female';
         $this->properties['century'] = $this->calculateCentury($matches['centuryHint']);
     }
