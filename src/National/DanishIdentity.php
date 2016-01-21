@@ -3,16 +3,13 @@
 namespace Komakino\Identity\National;
 
 use Komakino\Identity\Identity;
+use Komakino\Modulus11\Modulus11;
 use Komakino\Identity\Traits\BirthdayTrait;
 
 class DanishIdentity extends Identity
 {
 
     use BirthdayTrait;
-
-    protected $validationPattern = '/^[\d]{6}-?[\d]{4}$/';
-    protected $parsePattern      = '/^(?<day>\w{2})(?<month>\w{2})(?<year>\w{2})-?(?<sequence>(?<centuryHint>\w)\w{3})/';
-    protected $outputFormat      = '{day}{month}{year}-{sequence}';
 
     protected $properties = [
         'century'  => null,
@@ -24,6 +21,14 @@ class DanishIdentity extends Identity
         'birthday' => null,
     ];
 
+    function __construct($code) {
+        $this->validationPattern = strtr("/^:day::month::year:-?[\d]{4}$/", $this->macros);
+        $this->parsePattern      = strtr("/^%day%%month%%year%-?(?<sequence>(?<centuryHint>\d)\d{3})/", $this->macros);
+        $this->outputFormat      = '{day}{month}{year}-{sequence}';
+
+        parent::__construct($code);
+    }
+
     protected function parse()
     {
         $matches = parent::parse();
@@ -31,6 +36,12 @@ class DanishIdentity extends Identity
         $this->properties['gender']   = $this->properties['sequence'] % 2 ? 'male' : 'female';
         $this->properties['century']  = $this->calculateCentury($matches['centuryHint']);
         $this->properties['birthday'] = $this->composeBirthday();
+    }
+
+    protected function validate()
+    {
+        $number = $this->format();
+        return Modulus11::validate($number);
     }
 
     private function calculateCentury($hint)

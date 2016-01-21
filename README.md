@@ -6,6 +6,7 @@ Identity is a composer package to validate, parse, format and extract various in
 * Swedish personnummer/organisationsnummer
 * Danish personnummer/CPR-nummer
 * Finnish henkilötunnus/personbeteckning
+* Norwegian fødselsnummer
 
 ## Installation
 
@@ -67,14 +68,16 @@ Upon construction, the number is parsed and validated.
 * `0110172721`
 * `011017-2721`
 * `011017+2721`
+* `200110172721`
 * `20011017-2721`
+* `20011017+2721`
 
 #### Formatted output
 `011017-2721`
 
 #### Number properties
 * **type**
-    * *organization*/*person*
+    * *organization* or *person*
 * **century**
     * Sources for century:
         * Provided in number as **OO**xxxxxx-xxxx
@@ -96,7 +99,7 @@ Upon construction, the number is parsed and validated.
 * **number**
     * xxxxxx-xx**O**x
 * **gender**
-    * *male*/*female*
+    * *male* or *female*
 * **checkdigit**
     * xxxxxx-xxx**O**
 * **birthday**
@@ -127,7 +130,7 @@ Upon construction, the number is parsed and validated.
 * **sequence**
     * xxxxxx-**OOO0**
 * **gender**
-    * *male*/*female*
+    * *male* or *female*
 * **birthday**
     * A **DateTime** object
 
@@ -157,6 +160,47 @@ Upon construction, the number is parsed and validated.
 * **checkdigit**
     * xxxxxx-xxx**O**
 * **gender**
-    * *male*/*female*
+    * *male* or *female*
 * **birthday**
     * A **DateTime** object
+
+
+### Norwegian fødselsnummer
+
+#### Allowed input
+* `17058332143`
+
+#### Formatted output
+`17058332143`
+
+#### Number properties
+* **century**
+    * Calculated from *year* and *number*
+* **day**
+    * **OO**xxxxxxxxx
+* **month**
+    * xx**OO**xxxxxxx
+* **year**
+    * xxxx**OO**xxxxx
+* **number**
+    * xxxxxx**OOO**xx
+* **checkdigits**
+    * xxxxxxxxx**OO**
+* **gender**
+    * *male* or *female*
+* **birthday**
+    * A **DateTime** object
+* **D-number**
+    * *bool* Whether or not this is a D-number. Temporary number provided to immigrants etc.
+* **H-number**
+    * *bool* Whether or not this is a H-number. Temporary number used by health care etc.
+
+## Changelog
+
+### v1.1.0
+* Added implementation for Finnish henkilötunnus/personbeteckning
+
+### v1.0.0
+* Initial public release
+* Added implementation for Swedish personnummer/organisationsnummer
+* Added implementation for Danish personnummer/CPR-nummer

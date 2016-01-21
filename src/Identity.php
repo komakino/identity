@@ -6,6 +6,15 @@ abstract class Identity
 {
     public $valid  = false;
 
+    protected $macros = [
+        ':day:'   => '(?:0[1-9]|[1-2][0-9]|3[0-1])',        # 01-31
+        '%day%'   => '(?<day>0[1-9]|[1-2][0-9]|3[0-1])',
+        ':month:' => '(?:0[0-9]|1[0-2])',                   # 01-12
+        '%month%' => '(?<month>0[0-9]|1[0-2])',
+        ':year:'  => '(?:\d{2})',                           # 00-99
+        '%year%'  => '(?<year>\d{2})',
+    ];
+
     protected $code              = null;
     protected $properties        = ['code' => null];
     protected $validationPattern = '/.*/';
@@ -17,7 +26,7 @@ abstract class Identity
         if($this->validatePattern()){
             $this->parse();
             $this->valid = $this->validate();
-        } else var_dump($code);
+        }
     }
 
     protected function validatePattern()

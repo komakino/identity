@@ -4,18 +4,13 @@ namespace Komakino\Identity\National;
 
 use Komakino\Luhn\Luhn;
 use Komakino\Identity\Identity;
-use Komakino\Identity\Traits\BirthdayTrait;
 
 class SwedishIdentity extends Identity
 {
-    use BirthdayTrait;
-
-    protected $validationPattern = '/^(?:[\d]{2})?[\d]{6}[-+]?[\d]{4}$/';
-    protected $parsePattern      = '/^(?<century>\w{2})?(?<year>\w{2})(?<month>\w{2})(?<day>\w{2})(?<centuryHint>[-+]?)(?<locality>\w{2})(?<number>\w{1})(?<checkdigit>\w{1})/';
-    protected $outputFormat      = '{year}{month}{day}{centuryHint}{locality}{number}{checkdigit}';
 
     protected $properties = [
         'type'        => null,
+        'form'        => null,
         'century'     => null,
         'year'        => null,
         'month'       => null,
@@ -30,6 +25,25 @@ class SwedishIdentity extends Identity
         'temporary'   => false,
     ];
 
+    function __construct($code) {
+
+        $macros = [
+            ':century:' => '(?:1[68-9]|20)',                            # 16,18,19,20 - 16 is organizations
+            '%century%' => '(?<century>1[68-9]|20)',
+            ':day:'     => '(?:[06][1-9]|[1-27-8][0-9]|[39][0-1])',     # 01-31,61-91 - temporary numbers have 60 added to them
+            '%day%'     => '(?<day>[06][1-9]|[1-27-8][0-9]|[39][0-1])',
+            ':month:'   => '(?:0[1-9]|1[0-2]|[2-9][0-9])',              # 01-12,20-99 - organizations have >=20
+            '%month%'   => '(?<month>0[1-9]|1[0-2]|[2-9][0-9])',
+            ':year:'    => '(?:\d{2})',                                 # 00-99
+            '%year%'    => '(?<year>(?<form>\d)\d)',
+        ];
+
+        $this->validationPattern = strtr("/^:century:?:year::month::day:[-+]?[\d]{4}$/", $macros);
+        $this->parsePattern      = strtr("/^%century%?%year%%month%%day%(?<centuryHint>[-+]?)(?<locality>\d{2})(?<number>\d{1})(?<checkdigit>\d{1})/", $macros);
+        $this->outputFormat      = '{year}{month}{day}{centuryHint}{locality}{number}{checkdigit}';
+
+        parent::__construct($code);
+    }
 
     protected function validate(){
         return Luhn::validate($this->format());
@@ -39,36 +53,40 @@ class SwedishIdentity extends Identity
     {
         $matches = parent::parse();
 
-        if($this->properties['day'] >= 60){
-            $this->properties['day'] -= 60;
-            $this->properties['temporary'] = true;
-        }
-
         if(!$matches['centuryHint']){
             $this->properties['centuryHint'] = '-';
         }
 
-        if($this->properties['month'] > 12){
+        if($this->properties['month'] >= 20){
             $this->properties['type']       = 'organization';
             $this->properties['century']    = '16';
+            $this->properties['form']       = $this->parseForm($matches['form']);
         } else {
+            if($this->properties['day'] >= 60){
+                $this->properties['temporary'] = true;
+            }
+
             $this->properties['type']       = 'person';
             $this->properties['century']    = $matches['century'] ?: $this->calculateCentury($matches['centuryHint']);
             $this->properties['gender']     = $this->properties['number'] % 2 ? 'male' : 'female';
             $this->properties['birthday']   = $this->composeBirthday();
             $this->properties['county']     = $this->parseCounty();
         }
+    }
 
+    private function composeBirthday(){
+        extract($this->properties);
+        $day -= $day > 60 ? 60 : 0;
+        return date_create("{$century}{$year}-{$month}-{$day}");
     }
 
     private function calculateCentury($centuryHint)
     {
         extract($this->properties);
-        $thisYear = date('y');
-        if($year <= $thisYear){
-            $century = "20";
+        if($year <= date('y')){
+            $century = 20;
         } else {
-            $century = "19";
+            $century = 19;
         }
         if($centuryHint == '+') $century -= 1;
 
@@ -78,39 +96,53 @@ class SwedishIdentity extends Identity
     private function parseCounty(){
         extract($this->properties);
         $countyMap = [
-            "Stockholms län"          => [00,13],
-            "Uppsala län"             => [14,15],
-            "Södermanlands län"       => [16,18],
-            "Östergötlands län"       => [19,23],
-            "Jönköpings län"          => [24,26],
-            "Kronobergs län"          => [27,28],
-            "Kalmar län"              => [29,31],
-            "Gotlands län"            => [32,32],
-            "Blekinge län"            => [33,34],
-            "Kristianstads län"       => [35,38],
-            "Malmöhus län"            => [39,45],
-            "Hallands län"            => [46,47],
-            "Göteborgs och Bohus län" => [48,54],
-            "Älvsborgs län"           => [55,58],
-            "Skaraborgs län"          => [59,61],
-            "Värmlands län"           => [62,64],
-            "Örebro län"              => [66,68],
-            "Västmanlands län"        => [69,70],
-            "Kopparbergs län"         => [71,73],
-            "Gävleborgs län"          => [75,77],
-            "Västernorrlands län"     => [78,81],
-            "Jämtlands län"           => [82,84],
-            "Västerbottens län"       => [85,88],
-            "Norrbottens län"         => [89,92],
+            "Stockholms"          => [00,13],
+            "Uppsala"             => [14,15],
+            "Södermanlands"       => [16,18],
+            "Östergötlands"       => [19,23],
+            "Jönköpings"          => [24,26],
+            "Kronobergs"          => [27,28],
+            "Kalmar"              => [29,31],
+            "Gotlands"            => [32,32],
+            "Blekinge"            => [33,34],
+            "Kristianstads"       => [35,38],
+            "Malmöhus"            => [39,45],
+            "Hallands"            => [46,47],
+            "Göteborgs och Bohus" => [48,54],
+            "Älvsborgs"           => [55,58],
+            "Skaraborgs"          => [59,61],
+            "Värmlands"           => [62,64],
+            "Örebro"              => [66,68],
+            "Västmanlands"        => [69,70],
+            "Kopparbergs"         => [71,73],
+            "Gävleborgs"          => [75,77],
+            "Västernorrlands"     => [78,81],
+            "Jämtlands"           => [82,84],
+            "Västerbottens"       => [85,88],
+            "Norrbottens"         => [89,92],
         ];
 
         if($year < 90){ // After Jan 1 1990 this is no longer used.
             foreach ($countyMap as $county => list($min,$max)) {
-                if($locality >= $min && $locality <= $max) return $county;
+                if($locality >= $min && $locality <= $max) return $county . ' län';
             }
         }
 
         return null;
+    }
+
+    public function parseForm($form)
+    {
+        switch($form){
+            case 1: return 'estate';        # Dödsbon
+            case 2: return 'public';        # Stat, landsting, kommuner, församlingar
+            case 3: return 'foreign';       # Utländska företag som bedriver näringsverksamhet eller äger fastigheter i Sverige
+            case 5: return 'limited';       # Aktiebolag
+            case 6: return 'partnership';   # Enkelt bolag
+            case 7: return 'association';   # Ekonomiska föreningar
+            case 8: return 'foundation';    # Ideella föreningar och stiftelser
+            case 9: return 'trading';       # Handelsbolag, kommanditbolag och enkla bolag
+        }
     }
 
 }

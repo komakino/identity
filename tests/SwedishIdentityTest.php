@@ -15,7 +15,7 @@ class SwedishIdentityTest extends \PHPUnit_Framework_TestCase
     public function setUp() {
         $this->nineteenthCenturyMan       = new SwedishIdentity('830517+0956');
         $this->twentiethCenturyMan        = new SwedishIdentity('451023-5411');
-        $this->twentyFirstCenturyWoman    = new SwedishIdentity('20011017-2721');
+        $this->twentyFirstCenturyWoman    = new SwedishIdentity('20011077-2723'); // Temporary number
         $this->twentyFirstCenturyBabyGirl = new SwedishIdentity('121124-1540');
         $this->organization               = new SwedishIdentity('556925-7297');
     }

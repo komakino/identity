@@ -10,10 +10,6 @@ class FinnishIdentity extends Identity
 
     use BirthdayTrait;
 
-    protected $validationPattern = '/^[\d]{6}[+-A][\d]{3}[0-9A-Y]$/';
-    protected $parsePattern      = '/^(?<day>\w{2})(?<month>\w{2})(?<year>\w{2})(?<centuryHint>[+-A])(?<number>\w{3})(?<checkdigit>[0-9A-Y])/';
-    protected $outputFormat      = '{day}{month}{year}{centuryHint}{number}{checkdigit}';
-
     protected $properties = [
         'day'         => null,
         'month'       => null,
@@ -25,6 +21,14 @@ class FinnishIdentity extends Identity
         'gender'      => null,
         'birthday'    => null,
     ];
+
+    function __construct($code) {
+        $this->validationPattern = strtr("/^:day::month::year:[+-A][\d]{3}[0-9A-Y]$/", $this->macros);
+        $this->parsePattern      = strtr("/^%day%%month%%year%(?<centuryHint>[+-A])(?<number>\d{3})(?<checkdigit>[0-9A-Y])/", $this->macros);
+        $this->outputFormat      = '{day}{month}{year}{centuryHint}{number}{checkdigit}';
+
+        parent::__construct($code);
+    }
 
     protected function parse()
     {
