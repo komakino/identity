@@ -30,8 +30,8 @@ class SwedishIdentity extends Identity
         $macros = [
             ':century:' => '(?:1[68-9]|20)',                            # 16,18,19,20 - 16 is organizations
             '%century%' => '(?<century>1[68-9]|20)',
-            ':day:'     => '(?:[06][1-9]|[1-27-8][0-9]|[39][0-1])',     # 01-31,61-91 - temporary numbers have 60 added to them
-            '%day%'     => '(?<day>[06][1-9]|[1-27-8][0-9]|[39][0-1])',
+            ':day:'     => '(?:\d{2})',                                 # 01-31,61-91 - temporary numbers have 60 added to them
+            '%day%'     => '(?<day>\d{2})',
             ':month:'   => '(?:0[1-9]|1[0-2]|[2-9][0-9])',              # 01-12,20-99 - organizations have >=20
             '%month%'   => '(?<month>0[1-9]|1[0-2]|[2-9][0-9])',
             ':year:'    => '(?:\d{2})',                                 # 00-99
