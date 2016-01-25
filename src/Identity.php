@@ -44,8 +44,8 @@ abstract class Identity
         preg_match($this->parsePattern,$this->code,$matches);
 
         foreach(array_keys($this->properties) as $part){
-            if(array_key_exists($part, $matches)){
-                $this->properties[$part] = $matches[$part] ?: null;
+            if(array_key_exists($part, $matches) && $matches[$part] !== ""){
+                $this->properties[$part] = $matches[$part];
             }
         }
 
