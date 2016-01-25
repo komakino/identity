@@ -5,6 +5,7 @@ namespace Komakino\Identity;
 abstract class Identity
 {
     public $valid  = false;
+    public $pretty  = "";
 
     protected $macros = [
         ':day:'   => '(?:0[1-9]|[1-2][0-9]|3[0-1])',        # 01-31
@@ -25,7 +26,8 @@ abstract class Identity
         $this->code = $code;
         if($this->validatePattern()){
             $this->parse();
-            $this->valid = $this->validate();
+            $this->valid  = $this->validate();
+            $this->pretty = $this->format();
         }
     }
 
@@ -74,11 +76,7 @@ abstract class Identity
 
     public function __toString()
     {
-        if($this->valid){
-            return $this->format();
-        } else {
-            return '';
-        }
+        return $this->pretty;
     }
 
     public function __get($name)
