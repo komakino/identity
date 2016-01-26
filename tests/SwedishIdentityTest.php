@@ -3,6 +3,7 @@
 namespace Komakino\Identity\Tests;
 
 use Komakino\Identity\National\SwedishIdentity;
+use Komakino\Identity\Errors\IdentityInvalidFormatException;
 
 class SwedishIdentityTest extends \PHPUnit_Framework_TestCase
 {
@@ -42,10 +43,13 @@ class SwedishIdentityTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('female', $this->twentyFirstCenturyWoman->gender);
     }
 
+    /**
+     * @expectedException Komakino\Identity\Errors\IdentityInvalidFormatException
+     */
     public function testStaticMethods()
     {
         $this->assertTrue(SwedishIdentity::validate('556925-7297'));
-        $this->assertFalse(SwedishIdentity::validate('123456789'));
+        $this->assertInstanceOf(IdentityInvalidFormatException::class,SwedishIdentity::validate('123456789'));
         $this->assertTrue(SwedishIdentity::validate('451023-5411'));
         $this->assertEquals('451023-5411', (string)SwedishIdentity::format('194510235411'));
         $this->assertEquals('54', SwedishIdentity::parse('4510235411')['locality']);

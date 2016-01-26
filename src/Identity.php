@@ -2,6 +2,8 @@
 
 namespace Komakino\Identity;
 
+use Komakino\Identity\Errors\IdentityInvalidFormatException;
+
 abstract class Identity
 {
     public $valid  = false;
@@ -28,6 +30,8 @@ abstract class Identity
             $this->parse();
             $this->valid  = $this->validate();
             $this->pretty = $this->format();
+        } else {
+            throw new IdentityInvalidFormatException($code);
         }
     }
 

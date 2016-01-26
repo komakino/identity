@@ -32,6 +32,8 @@ $danishIdentity = new DanishIdentity('170583-7315');
 
 Upon construction, the number is parsed and validated.
 
+If number does not comply to the allowed input formats of the implementation, an IdentityInvalidFormatException will be thrown.
+
 #### Public properties
 
 * bool $valid
@@ -64,7 +66,7 @@ Upon construction, the number is parsed and validated.
 
 ### Swedish personnummer/organisationsnummer
 
-#### Allowed input
+#### Allowed input formats
 * `0110172721`
 * `011017-2721`
 * `011017+2721`
@@ -109,7 +111,7 @@ Upon construction, the number is parsed and validated.
 
 ### Danish personnummer/CPR-nummer
 
-#### Allowed input
+#### Allowed input formats
 * `1705837315`
 * `170583-7315`
 
@@ -137,7 +139,7 @@ Upon construction, the number is parsed and validated.
 
 ### Finnish personnummer/CPR-nummer
 
-#### Allowed input
+#### Allowed input formats
 * `311280-888Y`
 
 #### Formatted output
@@ -167,7 +169,7 @@ Upon construction, the number is parsed and validated.
 
 ### Norwegian fødselsnummer
 
-#### Allowed input
+#### Allowed input formats
 * `17058332143`
 
 #### Formatted output
@@ -196,6 +198,15 @@ Upon construction, the number is parsed and validated.
     * *bool* Whether or not this is a H-number. Temporary number used by health care etc.
 
 ## Changelog
+
+### v1.3.0
+* Will now throw an exception if number does'nt comply to the implementations allowed input format.
+
+### v1.2.1
+* Fixed issues with parsing zeros.
+
+### v1.2.0
+* Added implementation for Norwegian fødselsnummer
 
 ### v1.1.0
 * Added implementation for Finnish henkilötunnus/personbeteckning

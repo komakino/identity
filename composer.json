@@ -1,7 +1,12 @@
 {
     "name": "komakino/identity",
     "description": "Validation and property parsing of identity numbers",
-    "keywords": ["identity","number","luhn","swedish","social security number","personnummer","pno","ssn","validate"],
+    "keywords": [
+        "identity","number","luhn","swedish","norwegian","finnish","danish",
+        "social security number","personnummer","pno","ssn","validate",
+        "organisationsnummer","CPR-nummer","henkilötunnus","personbeteckning",
+        "fødselsnummer"
+    ],
     "homepage": "http://www.github.com/komakino/identity",
     "authors": [
         {
@@ -15,7 +20,7 @@
         }
     },
     "require": {
-        "komakino/luhn": "*",
+        "komakino/luhn": "^1.0",
         "komakino/modulus11": "^1.0"
     },
     "require-dev": {
